@@ -1,0 +1,11 @@
+[repository]
+name = "peniche"
+path = "/path/to/repository"
+
+[workspace]
+crates = { "my_crate" = { version = "0.1.0", path = "crates/my_crate" } }
+
+[git_workflow]
+feature_branch_prefix = "feature/"
+release_branch_prefix = "release/"
+commit_message_template = "feat: update {{file}}"
