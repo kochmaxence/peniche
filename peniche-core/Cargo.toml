@@ -1,0 +1,22 @@
+[package]
+name = "peniche-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+git2 = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+cargo = { workspace = true }
+cargo-util = { workspace = true }
+tracing = { workspace = true }
+toml_edit = { workspace = true }
+tokio = { workspace = true }
+config = "0.14.0"
+toml = "0.8.12"
+walkdir = "2.5.0"
+petgraph = "0.6.5"
+colored = { workspace = true }
+semver = "1.0.23"
+rand = { workspace = true }
