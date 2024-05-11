@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="LOGO.png">
+  <img src="assets/LOGO.png">
 </p>
 
 # Peniche
