@@ -12,6 +12,7 @@ use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command as AsyncCommand;
+use tokio::signal;
 use tokio::task::JoinSet;
 
 pub fn parse_command(command: &str) -> (&str, Vec<&str>) {
@@ -245,6 +246,7 @@ impl Command {
         }
 
         let mut child = cmd
+            .kill_on_drop(true)
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
             .spawn()?;
@@ -255,7 +257,9 @@ impl Command {
         let mut stdout_lines = stdout.lines();
         let mut stderr_lines = stderr.lines();
 
-        let tag_key = format!("{}{}{}", "[".dimmed(), key, "]".dimmed());
+        let tag_key = format!("{}{}{}", "[".dimmed(), key.dimmed(), "]".dimmed());
+
+        let ctrl_c = signal::ctrl_c();
 
         tokio::select! {
             _ = async {
@@ -264,15 +268,23 @@ impl Command {
                 }
                 Ok::<(), anyhow::Error>(())
             } => {},
+
             _ = async {
                 while let Some(line) = stderr_lines.next_line().await? {
                     eprintln!("{} {}", tag_key, line);
                 }
                 Ok::<(), anyhow::Error>(())
             } => {},
+
+            _ = ctrl_c => {
+                if let Ok(_) = child.kill().await {
+                    println!("{} {}", tag_key, "Process was killed due to Ctrl-C".bold());
+                }
+            },
         }
 
-        child.wait().await?; // Ensure process has finished
+        let _ = child.wait().await; // Ensure the child process exits cleanly
+
         Ok(())
     }
 }
